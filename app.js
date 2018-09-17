@@ -1,47 +1,63 @@
 const express = require('express')
-const mongodb = require('mongodb')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
+
+mongoose.Promise - global.Promise;
+//เชื่อม data base 
+mongoose.connect('mongodb://localhost/database_study').then((doc) =>{
+console.log('success to connect database study')
+},(err) =>{
+    console.log('fail to connect database study ')
+})
+
+var Schema = mongoose.Schema
+
+var StudentSchema = new Schema({
+    id: {
+        type: String,
+        unique:true,
+        required:true,
+        minlength:8,
+        maxlength:8
+    },
+    firstname :{
+        type:String,
+        required:true
+    },
+    lastname :{
+        type:String,
+        required:true
+    },
+    age:{
+        type:Number
+    }
+})
+var Student = mongoose.model('student',StudentSchema)
 
 var app = express() //เรียกใช้เสมอถ้าใช้ express
+app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-    res.send('hello')
-})
-let student = [
-    {
-        id: 'st1',
-        name: 'p1'
-    }, {
-        id: 'st2',
-        name: 'p2'
-    }, {
-        id: 'st3',
-        name: 'p3'
-    }
-]
-app.get('/all-student', (req, res) => {
-    res.send(student)
+//api post
+app.post('/post', (req,res) => {
+    let newStudent = Student({
+        id: req.body.id,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        age: req.body.age
+    })
+    newStudent.save().then((doc) =>{
+        res.send(doc)
+    },(err) =>{
+        res.send(err)
+    })
 })
 
-app.get('/all-student/:id', (req, res) => {
-    let studentID = req.params.id
-    for (let i = 0; i< student.length; i++) {
-        if (studentID == student[i].id) {
-            res.send(student[i])
-            break;
-        }
-    }
-    res.send('not found this id :' + studentID)
-})
-
-app.get('/all-student/name/:name', (req, res) => {
-    let studentNAME = req.params.name
-    for (let i = 0; i< student.length; i++) {
-        if (studentNAME == student[i].name) {
-            res.send(student[i])
-            break;
-        }
-    }
-    res.send('not found this name :' + studentNAME)
+app.get('/getStudent', (req, res) => {
+    user.find().then((doc) => {
+        res.send(doc)
+    }, (err) => {
+        res.status(404).send(err)
+    })
 })
 
 
